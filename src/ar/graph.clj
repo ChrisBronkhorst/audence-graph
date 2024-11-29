@@ -11,6 +11,7 @@
    :out   {}})
 
 (defn add-node [g node] (update g :nodes conj node))
+(defn add-nodes [g new-nodes] (update g :nodes (fn [nodes] (into nodes new-nodes))))
 
 (defn add-edge
   ([g from to] (add-edge g from to 1))
