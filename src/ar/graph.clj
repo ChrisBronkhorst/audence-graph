@@ -8,41 +8,44 @@
 ;
 ; The code is reproduced here for readability:
 
-(def G {:1 [:2 :3],
-        :2 [:4],
-        :3 [:4],
+(defn edge [node weight]
+  {:node node :weight weight})
+
+(def G {:1 [(edge :2 1) (edge :3 1)],
+        :2 [(edge :4 3)],
+        :3 [(edge :4 5)],
         :4 []})
 
-(defn traverse-graph-dfs [g s]
+(defn traverse-graph-dfs [graph s]
   (loop [vertices [] explored #{s} frontier [s]]
     (if (empty? frontier)
       vertices
-      (let [v (peek frontier)
-            neighbors (g v)]
+      (let [v         (peek frontier)
+            neighbors (map :node (graph v))]
         (recur
           (conj vertices v)
           (into explored neighbors)
           (into (pop frontier) (remove explored neighbors)))))))
 
-(defn seq-graph-dfs [g s]
+(defn seq-graph-dfs [graph s]
   (letfn [(rec-dfs [explored frontier]
             (lazy-seq
               (if (empty? frontier)
                 nil
-                (let [v (peek frontier)
-                      neighbors (g v)]
+                (let [v         (peek frontier)
+                      neighbors (map :node (graph v))]
                   (cons v (rec-dfs
                             (into explored neighbors)
                             (into (pop frontier) (remove explored neighbors))))))))]
    (rec-dfs #{s} [s])))
 
-(defn seq-graph-bfs [g s]
+(defn seq-graph-bfs [graph s]
   (letfn [(rec-bfs [explored frontier]
             (lazy-seq
               (if (empty? frontier)
                 nil
-                (let [v (peek frontier)
-                      neighbors (g v)]
+                (let [v         (peek frontier)
+                      neighbors (map :node (graph v))]
                   (cons v (rec-bfs
                             (into explored neighbors)
                             (into (pop frontier) (remove explored neighbors))))))))]
@@ -52,20 +55,19 @@
 (seq-graph-dfs G :1) ; => (:1 :3 :4 :2)
 (seq-graph-bfs G :1) ; => (:1 :2 :3 :4)
 
-;==================== QUESTION 1 ====================
 ; The author then simplifies it by recognising that only the initial data
 ; structure for holding the nodes traversed is different between the depth
 ; and breadth first implementations.
 
 ;He then abstacts that out and the result is:
 
-(defn seq-graph [d g s]
+(defn seq-graph [d graph s]
   (letfn [(rec-seq [explored frontier]
             (lazy-seq
               (if (empty? frontier)
                 nil
-                (let [v (peek frontier)
-                      neighbors (g v)]
+                (let [v         (peek frontier)
+                      neighbors (map :node (graph v))]
                   (cons v (rec-seq
                             (into explored neighbors)
                             (into (pop frontier) (remove explored neighbors))))))))]
@@ -76,3 +78,6 @@
 
 (seq-graph-dfs G :1) ; => (:1 :3 :4 :2)
 (seq-graph-bfs G :1) ; => (:1 :2 :3 :4)
+
+;==================== QUESTION 1 ====================
+;1. Extend the graph definition to include a weight between graph edges 
