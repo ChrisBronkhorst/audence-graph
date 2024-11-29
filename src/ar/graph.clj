@@ -25,16 +25,16 @@
           (into (pop frontier) (remove explored neighbors)))))))
 
 (defn seq-graph-dfs [g s]
-  (let [rec-dfs (fn rec-dfs [explored frontier]
-                  (lazy-seq
-                    (if (empty? frontier)
-                      nil
-                      (let [v (peek frontier)
-                            neighbors (g v)]
-                        (cons v (rec-dfs
-                                  (into explored neighbors)
-                                  (into (pop frontier) (remove explored neighbors))))))))]
-    (rec-dfs #{s} [s])))
+  ((fn rec-dfs [explored frontier]
+     (lazy-seq
+       (if (empty? frontier)
+         nil
+         (let [v (peek frontier)
+               neighbors (g v)]
+           (cons v (rec-dfs
+                     (into explored neighbors)
+                     (into (pop frontier) (remove explored neighbors))))))))
+   #{s} [s]))
 
 (defn seq-graph-bfs [g s]
   ((fn rec-bfs [explored frontier]
@@ -52,13 +52,13 @@
 (seq-graph-dfs G :1) ; => (:1 :3 :4 :2)
 (seq-graph-bfs G :1) ; => (:1 :2 :3 :4)
 
-
 ;==================== QUESTION 1 ====================
 ; The author then simplifies it by recognising that only the initial data
 ; structure for holding the nodes traversed is different between the depth
 ; and breadth first implementations.
 
 ;He then abstacts that out and the result is:
+
 (defn seq-graph [d g s]
   ((fn rec-seq [explored frontier]
      (lazy-seq
@@ -72,8 +72,7 @@
    #{s} (conj d s)))
 
 (def seq-graph-dfs (partial seq-graph []))
-(def seq-graph-bfs (partial seq-graph (PersistentQueue/EMPTY)))
+(def seq-graph-bfs (partial seq-graph PersistentQueue/EMPTY))
 
 (seq-graph-dfs G :1) ; => (:1 :3 :4 :2)
 (seq-graph-bfs G :1) ; => (:1 :2 :3 :4)
-
