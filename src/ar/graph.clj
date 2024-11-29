@@ -25,28 +25,28 @@
           (into (pop frontier) (remove explored neighbors)))))))
 
 (defn seq-graph-dfs [g s]
-  ((fn rec-dfs [explored frontier]
-     (lazy-seq
-       (if (empty? frontier)
-         nil
-         (let [v (peek frontier)
-               neighbors (g v)]
-           (cons v (rec-dfs
-                     (into explored neighbors)
-                     (into (pop frontier) (remove explored neighbors))))))))
-   #{s} [s]))
+  (letfn [(rec-dfs [explored frontier]
+            (lazy-seq
+              (if (empty? frontier)
+                nil
+                (let [v (peek frontier)
+                      neighbors (g v)]
+                  (cons v (rec-dfs
+                            (into explored neighbors)
+                            (into (pop frontier) (remove explored neighbors))))))))]
+   (rec-dfs #{s} [s])))
 
 (defn seq-graph-bfs [g s]
-  ((fn rec-bfs [explored frontier]
-     (lazy-seq
-       (if (empty? frontier)
-         nil
-         (let [v (peek frontier)
-               neighbors (g v)]
-           (cons v (rec-bfs
-                     (into explored neighbors)
-                     (into (pop frontier) (remove explored neighbors))))))))
-   #{s} (conj PersistentQueue/EMPTY s)))
+  (letfn [(rec-bfs [explored frontier]
+            (lazy-seq
+              (if (empty? frontier)
+                nil
+                (let [v (peek frontier)
+                      neighbors (g v)]
+                  (cons v (rec-bfs
+                            (into explored neighbors)
+                            (into (pop frontier) (remove explored neighbors))))))))]
+    (rec-bfs #{s} (conj PersistentQueue/EMPTY s))))
 
 (traverse-graph-dfs G :1) ; => [:1 :3 :4 :2]
 (seq-graph-dfs G :1) ; => (:1 :3 :4 :2)
@@ -60,16 +60,16 @@
 ;He then abstacts that out and the result is:
 
 (defn seq-graph [d g s]
-  ((fn rec-seq [explored frontier]
-     (lazy-seq
-       (if (empty? frontier)
-         nil
-         (let [v (peek frontier)
-               neighbors (g v)]
-           (cons v (rec-seq
-                     (into explored neighbors)
-                     (into (pop frontier) (remove explored neighbors))))))))
-   #{s} (conj d s)))
+  (letfn [(rec-seq [explored frontier]
+            (lazy-seq
+              (if (empty? frontier)
+                nil
+                (let [v (peek frontier)
+                      neighbors (g v)]
+                  (cons v (rec-seq
+                            (into explored neighbors)
+                            (into (pop frontier) (remove explored neighbors))))))))]
+   (rec-seq #{s} (conj d s))))
 
 (def seq-graph-dfs (partial seq-graph []))
 (def seq-graph-bfs (partial seq-graph PersistentQueue/EMPTY))
