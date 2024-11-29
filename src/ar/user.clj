@@ -1,7 +1,7 @@
 (ns ar.user
   [:require [ar.algo :as algo]
             [ar.generate :as generate]
-            [ar.graph :refer [add-edge graph]]])
+            [ar.graph :refer [add-edge empty-graph count-edges]]])
 
 ; This link has a simple explanation of a simple Graph definition "language"
 ; and implementations of depth/breadth graph search algorithms.
@@ -15,7 +15,7 @@
 ;        :3 [(edge :4 5)],
 ;        :4 []})
 
-(def G (-> (graph)
+(def G (-> (empty-graph)
            (add-edge :1 :2 1)
            (add-edge :1 :3 1)
            (add-edge :2 :4 3)
@@ -32,5 +32,15 @@
 
   nil)
 
+
+
 ;==================== QUESTION 1 ====================
 ;1. Extend the graph definition to include a weight between graph edges
+
+
+;==================== QUESTION 2 ====================
+; generate simple connected graph G(n,s) with N vertices and S edges
+
+; generate and random directed graph (not connected yet)
+(count-edges (generate/generate-graph 10 90))
+;

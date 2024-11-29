@@ -5,7 +5,7 @@
 ; there is duplication for the sake of performance
 ; If there is no edge strength, it is assumed to be 1.
 
-(defn graph []
+(defn empty-graph []
   {:nodes #{}
    :in    {}
    :out   {}})
@@ -22,5 +22,16 @@
        (add-node to)   ; adding and edge adds a node
        (assoc-in [:out from to] strength)
        (assoc-in [:in to from] strength))))
+
+(defn remove-edge [g from to]
+  (-> g
+      (update-in [:out from] dissoc to)
+      (update-in [:in to] dissoc from)))
+
+(defn count-edges [g]
+  (->> (:out g)
+       (vals)
+       (map count)
+       (reduce + 0)))
 
 (defn neighbours [g node] (get-in g [:out node]))

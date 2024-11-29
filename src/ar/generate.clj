@@ -1,48 +1,56 @@
 (ns ar.generate
-  [:require [ar.graph :refer [edge]]])
+  [:require [ar.graph :refer [add-edge
+                              remove-edge
+                              empty-graph
+                              count-edges]]])
 
 ; ================== Question 2 ====================
-; Generate a random graph (spanning tree or disconnected? Can it be counted as a graph if it's disconnected? Or would it be multiple graphs?)
+; Generate a random graph
 ; Input:
 ; N - size of generated graph (number of nodes)
 ; S - sparseness (number of directed edges actually; from N-1 (inclusive) to N(N-1) (inclusive))
-;                        Output:
-;                        simple connected graph G(n,s) with N vertices and S edges)
+; Output
+;  - simple connected graph G(n,s) with N vertices and S edges)
 
-(defn generate-graph [n s]
-  (let [nodes (mapv (comp keyword str) (range 1 (inc n)))
-        edges (for [i (range s)]
-                (let [node (rand-nth nodes)]
-                  node))]
+(defn random-connection-proposals
+  "Generate a lazy sequence of random pairs from the given nodes."
+  [nodes]
+  (let [nodes (vec nodes)]
+    (letfn [(rec-random-pairs []
+              (lazy-seq
+                (loop [from (rand-nth nodes)
+                       to   (rand-nth nodes)]
+                  (if (not= from to) ; no self loops
+                    (cons [from to] (rec-random-pairs))
+                    (recur (rand-nth nodes) (rand-nth nodes))))))]
+      (rec-random-pairs))))
 
-    edges))
+(comment
+  (count (take 5 (random-connection-proposals (set (range 1 200)))))
+
+  (every? (fn [[from to]] (not= from to))
+          (take 1000 (random-connection-proposals (set (range 1 200)))))
+
+  nil)
 
 (defn random-weight []
-  (inc (rand-int 10))) ; Generate weights between 1 and 10
+  (inc (rand-int 100)))
 
-(defn generate-vertex-keys [n]
-  (map #(keyword (str %)) (range 1 (inc n))))
+(defn generate-graph [n s]
+  "Total possible connections without self loops is n^2-n"
+  (assert (<= s (* n (dec n))) "Too many edges")
+  (let [graph (-> (empty-graph)
+                  (assoc :nodes (set (range 1 (inc n)))))]
+    (loop [i              0
+           g              graph
+           possible-edges (random-connection-proposals (:nodes graph))]
+      (if (= i s)
+        g
+        (let [[from to] (first possible-edges)]
+          (if (get-in g [:out from to])
+            ; edge already exists
+            (recur i g (rest possible-edges))
+            (recur (inc i) (add-edge g from to (random-weight)) (rest possible-edges))))))))
 
-(defn ensure-connectivity [n]
-  "Creates a spanning tree"
-  (let [vertices (generate-vertex-keys n)]
-    (into {}
-          (map-indexed
-            (fn [idx vertex]
-              (if (< idx (dec n))
-                [vertex [(edge (nth vertices (inc idx)) (random-weight))]]
-                [vertex []]))
-            vertices))))
-
-(defn add-random-edges [graph n s]
-  "Adds additional random edges to reach desired sparseness"
-  (let [vertices (keys graph)
-        edges    (loop [])]))
-
-(defn make-graph
-  "Generate a random connected graph with n vertices and s edges"
-  [n s]
-  {:pre [(>= s (dec n))
-         (<= s (* n (dec n)))]}
-  (-> (ensure-connectivity n)
-      (add-random-edges n s)))
+(comment
+  (count-edges (generate-graph 10 90)))
