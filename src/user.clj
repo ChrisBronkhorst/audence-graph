@@ -1,4 +1,4 @@
-(ns ar.user
+(ns user
   [:require [ar.algo :as algo]
             [ar.generate :as generate]
             [ar.graph :as graph :refer [empty-graph add-edge count-edges]]])
