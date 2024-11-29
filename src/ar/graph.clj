@@ -80,4 +80,17 @@
 (seq-graph-bfs G :1) ; => (:1 :2 :3 :4)
 
 ;==================== QUESTION 1 ====================
-;1. Extend the graph definition to include a weight between graph edges 
+;1. Extend the graph definition to include a weight between graph edges
+
+; ================== Question 2 ====================
+; Generate a random graph
+; Input:
+; N - size of generated graph (number of nodes)
+; S - sparseness (number of directed edges actually; from N-1 (inclusive) to N(N-1) (inclusive))
+;                        Output:
+;                        simple connected graph G(n,s) with N vertices and S edges)
+(defn generate-graph [n s]
+  (let [nodes (map (comp keyword str) (range 1 (inc n)))]
+    nodes))
+
+(generate-graph 5 5) ; => (:1 :2 :3 :4 :5)
