@@ -1,5 +1,6 @@
 (ns ar.algo
-  [:require [ar.graph :refer [neighbours]]]
+  [:require [ar.graph :refer [neighbours]]
+            [clojure.data.priority-map :as pm]]
   (:import (clojure.lang PersistentQueue)))
 
 (defn traverse-graph-dfs [graph s]
@@ -41,7 +42,7 @@
 ; structure for holding the nodes traversed is different between the depth
 ; and breadth first implementations.
 
-; He then abstacts that out and the result is:
+; He then abstracts that out and the result is:
 (defn seq-graph [d graph s]
   (letfn [(rec-seq [explored frontier]
             (lazy-seq
@@ -56,3 +57,34 @@
 
 (def seq-graph-dfs (partial seq-graph []))
 (def seq-graph-bfs (partial seq-graph PersistentQueue/EMPTY))
+
+(def INF Long/MAX_VALUE)
+
+(defn dijkstra [graph from to]
+  (assert (and (contains? (:nodes graph) from)
+               (contains? (:nodes graph) to))
+          "Nodes not in graph")
+  (let [nodes       (:nodes graph)
+        update-cost (fn [costs [node cost]] (if (< cost (costs node))
+                                              (assoc costs node cost)
+                                              costs))
+        path-costs  (loop [frontier (reduce (fn [pm node] (assoc pm node INF))
+                                            (pm/priority-map from 0)
+                                            (disj nodes from))
+                           visited  {}]
+                      (let [[current current-cost] (first frontier)]
+                        (if (or (not current) (= current-cost INF))
+                          visited
+                          (let [neighbours (neighbours graph current)
+                                edge-costs (->> neighbours
+                                                ; only consider neighbours still in frontier
+                                                (filter (comp frontier first))
+                                                ; calculate the edge cost of the neighbours through the current node
+                                                (map (fn [[node edge-cost]] [node (+ current-cost edge-cost)])))
+                                new-costs  (reduce update-cost frontier edge-costs)]
+                            (recur (dissoc new-costs current)
+                                   (assoc visited current current-cost))))))]
+    path-costs))
+
+(comment
+  (= Long/MAX_VALUE))

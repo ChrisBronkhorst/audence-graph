@@ -1,7 +1,11 @@
 (ns user
   [:require [ar.algo :as algo]
             [ar.generate :as generate]
-            [ar.graph :as graph :refer [empty-graph add-edge count-edges]]])
+            [ar.graph :as graph :refer [empty-graph
+                                        add-edge
+                                        count-edges
+                                        neighbours]]])
+
 
 ; This link has a simple explanation of a simple Graph definition "language"
 ; and implementations of depth/breadth graph search algorithms.
@@ -21,7 +25,7 @@
             (add-edge :2 :4 3)
             (add-edge :3 :4 5)))
 
-(def G2 (generate/make-graph 10 30)) ; uses integer node ids
+(def G2 (generate/make-graph 10 15)) ; uses integer node ids
 
 (comment
   (algo/traverse-graph-dfs G1 :1) ; => [:1 :3 :4 :2]
@@ -48,4 +52,8 @@
 ; generate simple connected graph G(n,s) with N vertices and S edges
 
 ; generate and random directed graph (not connected yet)
-(count-edges (generate/make-graph 10 90))
+(comment
+  (do G2)
+  (count-edges G2)
+  (neighbours G2 7)
+  (algo/dijkstra G2 7 7))
