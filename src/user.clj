@@ -55,5 +55,6 @@
 (comment
   (do G2)
   (count-edges G2)
-  (neighbours G2 7)
-  (algo/dijkstra G2 7 7))
+  (neighbours G2 3)
+  (neighbours G2 1)
+  (time (algo/dijkstra G2 4 3)))
