@@ -103,7 +103,6 @@
      {:parents @!parents
       :costs   path-costs})))
 
-
 (defn shortest-path [graph from to]
   (let [{:keys [parents]} (dijkstra graph from to)]
     (trace-path parents from to)))
