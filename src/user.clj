@@ -74,4 +74,5 @@
    (time (algo/shortest-path G1 :top-left :bottom-right))
    (time (algo/shortest-path G1 :top-left :outside))
    (time (algo/shortest-path G1 :top-right :outside))
-   (algo/eccentricity G1 :top-left)])
+   (algo/eccentricity G1 :top-left)
+   (algo/radius G1)])

@@ -117,9 +117,12 @@
 
 (defn radius
   "The radius r of a graph is the minimum eccentricity of any vertex;
-   r = min{ϵ(v) | v ∈ V} and V is the set of vertices in the graph."
-  [graph])
-
+   r = min{ϵ(v) | v ∈ V} and V is the set of vertices in the graph.
+   To me: The eccentricity of the vertex with the smallest eccentricity."
+  [graph]
+  (->> (:nodes graph)
+       (map (partial eccentricity graph))
+       (reduce min INF)))
 
 (defn diameter [graph])
 
