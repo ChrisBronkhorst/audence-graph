@@ -69,35 +69,38 @@
         (recur parent (conj path parent))
         nil))))
 
-(defn dijkstra [graph from to]
-  (assert (and (contains? (:nodes graph) from)
-               (contains? (:nodes graph) to))
-          "Nodes not in graph")
-  (let [nodes      (:nodes graph)
-        !parents   (atom {})                                ; ugh. not happy about this.
-        path-costs (loop [frontier (reduce (fn [pm node] (assoc pm node INF))
-                                           (pm/priority-map from 0)
-                                           (disj nodes from))
-                          visited  {}]
-                     (let [[current current-cost] (first frontier)
-                           update-cost (fn [costs [node cost]] (if (< cost (costs node))
-                                                                 (do (swap! !parents #(assoc % node current))
-                                                                     (assoc costs node cost))
-                                                                 costs))]
-                       (if (or (or (not current) (= current-cost INF))
-                               (= current to)) ; early stopping
-                         visited
-                         (let [neighbours (neighbours graph current)
-                               edge-costs (->> neighbours
-                                               ; only consider neighbours still in frontier
-                                               (filter (comp frontier first))
-                                               ; calculate the edge cost of the neighbours through the current node
-                                               (map (fn [[node edge-cost]] [node (+ current-cost edge-cost)])))
-                               new-costs  (reduce update-cost frontier edge-costs)]
-                           (recur (dissoc new-costs current)
-                                  (assoc visited current current-cost))))))]
-    {:parents @!parents
-     :costs   path-costs}))
+(defn dijkstra
+  ([graph from to] (dijkstra graph from to true))
+  ([graph from to stop-early?]
+   (assert (and (contains? (:nodes graph) from)
+                (contains? (:nodes graph) to))
+           "Nodes not in graph")
+   (let [nodes      (:nodes graph)
+         !parents   (atom {})                                ; ugh. not happy about this.
+         path-costs (loop [frontier (reduce (fn [pm node] (assoc pm node INF))
+                                            (pm/priority-map from 0)
+                                            (disj nodes from))
+                           visited  {}]
+                      (let [[current current-cost] (first frontier)
+                            update-cost (fn [costs [node cost]] (if (< cost (costs node))
+                                                                  (do (swap! !parents #(assoc % node current))
+                                                                      (assoc costs node cost))
+                                                                  costs))]
+                        (if (or (or (not current) (= current-cost INF)))
+                          visited
+                          (let [neighbours (neighbours graph current)
+                                edge-costs (->> neighbours
+                                                ; only consider neighbours still in frontier
+                                                (filter (comp frontier first))
+                                                ; calculate the edge cost of the neighbours through the current node
+                                                (map (fn [[node edge-cost]] [node (+ current-cost edge-cost)])))
+                                new-costs  (reduce update-cost frontier edge-costs)]
+                            (if (and (= current to) stop-early?) ; early stopping
+                              (assoc visited current current-cost)
+                              (recur (dissoc new-costs current)
+                                     (assoc visited current current-cost)))))))]
+     {:parents @!parents
+      :costs   path-costs})))
 
 
 (defn shortest-path [graph from to]

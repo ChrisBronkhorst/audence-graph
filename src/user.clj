@@ -67,5 +67,8 @@
              (add-edge :top-left :top-right 1)
              (add-edge :top-left :bottom-left 1)
              (add-edge :top-right :bottom-right 2) ; make this more expensive
-             (add-edge :bottom-left :bottom-right 1))]
-  (time (algo/dijkstra G1 :top-left :bottom-right)))
+             (add-edge :bottom-left :bottom-right 1)
+             (add-edge :bottom-right :outside 5))]
+  [(time (algo/dijkstra G1 :top-left :bottom-right))
+   ; calculate the cost to every reachable node
+   (time (algo/dijkstra G1 :top-left :bottom-right false))])
