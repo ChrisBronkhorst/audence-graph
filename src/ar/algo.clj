@@ -110,17 +110,16 @@
 (defn eccentricity
   "The eccentricity ϵ(v) of a vertex v is the greatest distance between v and any other vertex;
    ϵ(v) = max{d(v, w) | w ∈ V} and V is the set of vertices in the graph."
-  [graph]
-  (let [distances (for [v (:nodes graph)
-                        w (:nodes graph)
-                        :when (not= v w)]
-                    (let [{:keys [costs]} (dijkstra graph v w false)]
-                      (costs w)))]
-    (->> distances
-         (filter some?) ; there is not always a path from v to w
+  [graph v]
+  (let [{:keys [costs]} (dijkstra graph v v false)]
+    (->> (vals costs)
          (reduce max 0))))
 
-(defn radius [graph])
+(defn radius
+  "The radius r of a graph is the minimum eccentricity of any vertex;
+   r = min{ϵ(v) | v ∈ V} and V is the set of vertices in the graph."
+  [graph])
+
 
 (defn diameter [graph])
 
