@@ -127,7 +127,14 @@
        (map (partial eccentricity graph))
        (reduce min INF)))
 
-(defn diameter [graph])
+(defn diameter
+  "The diameter d of a graph is the maximum eccentricity of any vertex;
+   d = max{ϵ(v) | v ∈ V} and V is the set of vertices in the graph.
+   To me: The eccentricity of the vertex with the largest eccentricity."
+  [graph]
+  (->> (:nodes graph)
+       (map (partial eccentricity graph))
+       (reduce max 0)))
 
 (comment
   (= Long/MAX_VALUE))

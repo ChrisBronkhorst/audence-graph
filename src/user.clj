@@ -76,4 +76,5 @@
    (time (algo/shortest-path G1 :top-right :outside))
    (algo/eccentricity G1 :top-left)
    (algo/eccentricity G1 :top-right)
-   (algo/radius G1)])
+   (algo/radius G1)
+   (algo/diameter G1)])
