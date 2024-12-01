@@ -69,7 +69,7 @@
         (recur parent (conj path parent))
         nil))))
 
-(defn full-dijkstra [graph from to]
+(defn dijkstra [graph from to]
   (assert (and (contains? (:nodes graph) from)
                (contains? (:nodes graph) to))
           "Nodes not in graph")
@@ -100,8 +100,8 @@
      :costs   path-costs}))
 
 
-(defn dijkstra [graph from to]
-  (let [{:keys [parents]} (full-dijkstra graph from to)]
+(defn shortest-path [graph from to]
+  (let [{:keys [parents]} (dijkstra graph from to)]
     (trace-path parents from to)))
 
 (comment

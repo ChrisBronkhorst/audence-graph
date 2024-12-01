@@ -6,18 +6,17 @@
                                         count-edges
                                         neighbours]]])
 
+; refresh deps without restarting the REPL
+; need the new version of the clojure cli tools
+#_(clojure.repl.deps/sync-deps)
+
+
 
 ; This link has a simple explanation of a simple Graph definition "language"
 ; and implementations of depth/breadth graph search algorithms.
 ;
 ; http://hueypetersen.com/posts/2013/06/25/graph-traversal-with-clojure/
-;
-; The code is reproduced here for readability:
 
-;(def G {:1 [(edge :2 1) (edge :3 1)],
-;        :2 [(edge :4 3)],
-;        :3 [(edge :4 5)],
-;        :4 []})
 
 (def G1 (-> (empty-graph)
             (add-edge :1 :2 1)
@@ -53,8 +52,20 @@
 
 ; generate and random directed graph (not connected yet)
 (comment
-  (do G2)
-  (count-edges G2)
-  (neighbours G2 3)
-  (neighbours G2 1)
-  (time (algo/dijkstra G2 4 3)))
+  (let [graph (generate/make-graph 10 15)] ; uses integer node ids
+    [(count-edges graph)
+     (neighbours graph 3)
+     (neighbours graph 1)
+     (neighbours graph 4)]))
+
+; ==================== QUESTION 3 ====================
+; Implement Dijkstra's algorithm to find the shortest path between two nodes
+
+; check that we are doing correctly by creating a square graph
+
+(let [G1 (-> (empty-graph)
+             (add-edge :top-left :top-right 1)
+             (add-edge :top-left :bottom-left 1)
+             (add-edge :top-right :bottom-right 2) ; make this more expensive
+             (add-edge :bottom-left :bottom-right 1))]
+  (time (algo/dijkstra G1 :top-left :bottom-right)))

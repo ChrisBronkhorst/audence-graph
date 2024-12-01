@@ -15,14 +15,14 @@
 
 (defn add-edge
   ([g from to] (add-edge g from to 1))
-  ([g from to strength]
+  ([g from to weight]
    ; no self loops
    (assert (not= from to) "No self loops allowed")
    (-> g
        (add-node from) ; adding and edge adds a node
        (add-node to)   ; adding and edge adds a node
-       (assoc-in [:out from to] strength)
-       (assoc-in [:in to from] strength))))
+       (assoc-in [:out from to] weight)
+       (assoc-in [:in to from] weight))))
 
 (defn remove-edge [g from to]
   (-> g
