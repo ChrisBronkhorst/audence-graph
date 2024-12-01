@@ -62,7 +62,6 @@
 ; Implement Dijkstra's algorithm to find the shortest path between two nodes
 
 ; check that we are doing correctly by creating a square graph
-
 (let [G1 (-> (empty-graph)
              (add-edge :top-left :top-right 1)
              (add-edge :top-left :bottom-left 1)
@@ -71,4 +70,8 @@
              (add-edge :bottom-right :outside 5))]
   [(time (algo/dijkstra G1 :top-left :bottom-right))
    ; calculate the cost to every reachable node
-   (time (algo/dijkstra G1 :top-left :bottom-right false))])
+   (time (algo/dijkstra G1 :top-left :bottom-right false))
+   (time (algo/shortest-path G1 :top-left :bottom-right))
+   (time (algo/shortest-path G1 :top-left :outside))
+   (time (algo/shortest-path G1 :top-right :outside))
+   (algo/eccentricity G1)])
