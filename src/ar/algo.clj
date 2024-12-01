@@ -1,6 +1,7 @@
 (ns ar.algo
   [:require [ar.graph :refer [neighbours]]
-            [clojure.data.priority-map :as pm]]
+            [clojure.data.priority-map :as pm]
+            [clojure.set :as set]]
   (:import (clojure.lang PersistentQueue)))
 
 (defn traverse-graph-dfs [graph s]
@@ -112,8 +113,10 @@
    ϵ(v) = max{d(v, w) | w ∈ V} and V is the set of vertices in the graph."
   [graph v]
   (let [{:keys [costs]} (dijkstra graph v v false)]
-    (->> (vals costs)
-         (reduce max 0))))
+    (if (seq (set/difference (:nodes graph) (set (keys costs)))) ; not all nodes are reachable
+      INF
+      (->> (vals costs)
+           (reduce max 0)))))
 
 (defn radius
   "The radius r of a graph is the minimum eccentricity of any vertex;
